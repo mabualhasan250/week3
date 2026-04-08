@@ -38,3 +38,27 @@ jobs:
           file: ./templates/Dockerfile.frontend
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/week3-frontend:latest
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Ubuntu Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            # Navigate to your project
+            cd ~/week3_repo 
+            
+            # Login to GHCR (required if package is private)
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # Pull new images and restart
+            docker-compose pull
+            docker-compose up -d
+            
+            # Optional: Clean up old, unused images to save space
+            docker image prune -f          
