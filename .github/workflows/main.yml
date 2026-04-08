@@ -28,7 +28,6 @@ jobs:
           context: .
           file: ./Dockerfile.backend
           push: true
-          # This uses your username and repo name automatically
           tags: ghcr.io/${{ github.repository_owner }}/week3-backend:latest
 
       - name: Build and Push Frontend
@@ -38,6 +37,7 @@ jobs:
           file: ./templates/Dockerfile.frontend
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/week3-frontend:latest
+
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
@@ -50,15 +50,20 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            # Navigate to your project
+            # Navigate to the project directory
             cd ~/week3_repo 
             
-            # Login to GHCR (required if package is private)
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            # Login to GHCR using your Personal Access Token
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            # Pull new images and restart
+            # Securely create/update the .env file with your OpenAI key
+            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > .env
+            
+            # Pull the latest images built in the previous job
             docker-compose pull
+            
+            # Restart the containers with the new images and the .env file
             docker-compose up -d
             
-            # Optional: Clean up old, unused images to save space
-            docker image prune -f          
+            # Clean up old images to save disk space on your Ubuntu machine
+            docker image prune -f  
