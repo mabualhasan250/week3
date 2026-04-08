@@ -28,7 +28,7 @@ jobs:
           context: .
           file: ./Dockerfile.backend
           push: true
-          # Note: repository_owner is safer for image naming
+         
           tags: ghcr.io/${{ github.repository_owner }}/week3-backend:latest
 
       - name: Build and Push Frontend
@@ -41,20 +41,20 @@ jobs:
 
   deploy:
     needs: build-and-push
-    runs-on: self-hosted 
+    runs-on: cybersecurity 
     steps:
       - name: Pull and Restart Docker on Desktop
         run: |
-          # 1. Navigate to the Desktop where your docker-compose.yml is
-          cd ~/Desktop
           
-          # 2. Login to GHCR so the runner can pull the new images
+          cd ~/Desktop/docker-compose.yml
+          
+         
           echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           
-          # 3. Update the .env file with your OpenAI key
+          
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > .env
           
-          # 4. Pull the latest images and restart
+         
           docker-compose pull
           docker-compose up -d
           
