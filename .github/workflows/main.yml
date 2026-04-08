@@ -41,30 +41,22 @@ jobs:
 
   deploy:
     needs: build-and-push
-    runs-on: ubuntu-latest
+    runs-on: self-hosted 
     steps:
-      - name: Deploy to Ubuntu Server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            # 1. Navigate directly to your Desktop where the docker-compose.yml is
-            cd ~/Desktop
-            
-            # 2. Login to GHCR (required to pull your images)
-            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
-            # 3. Update the .env file on your Desktop with your OpenAI key
-            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > .env
-            
-            # 4. Pull the latest images from GitHub
-            docker-compose pull
-            
-            # 5. Restart the containers
-            docker-compose up -d
-            
-            # 6. Clean up old image versions to save space
-            docker image prune -f
+      - name: Pull and Restart Docker on Desktop
+        run: |
+          # 1. Navigate to the Desktop where your docker-compose.yml is
+          cd ~/Desktop
+          
+          # 2. Login to GHCR so the runner can pull the new images
+          echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          
+          # 3. Update the .env file with your OpenAI key
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > .env
+          
+          # 4. Pull the latest images and restart
+          docker-compose pull
+          docker-compose up -d
+          
+          # 5. Clean up old images
+          docker image prune -f
