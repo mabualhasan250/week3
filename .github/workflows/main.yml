@@ -46,7 +46,7 @@ jobs:
       - name: Pull and Restart Docker on Desktop
         run: |
           
-          cd ~/Desktop/docker-compose.yml
+          cd ~/Desktop
           
          
           echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
