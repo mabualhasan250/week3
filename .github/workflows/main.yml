@@ -47,7 +47,8 @@ jobs:
         run: |
           
           cd ~/Desktop/week3/
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > .env
           docker compose down
           docker compose up -d
-        env:
-          MY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
