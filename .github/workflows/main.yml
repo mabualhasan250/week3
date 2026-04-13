@@ -45,7 +45,7 @@ jobs:
     steps:
       - name: Pull and Restart Docker on Desktop
         run: |
-          sudo chmod 666 /var/run/docker.sock
+          
           cd ~/Desktop/week3/
           docker compose down
           docker compose up -d
