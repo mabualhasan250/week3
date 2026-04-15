@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       contents: read
       packages: write
@@ -41,7 +41,7 @@ jobs:
 
   deploy:
     needs: build-and-push
-    runs-on: cybersecurity 
+    runs-on: self-hosted 
     steps:
       - name: Pull and Restart Docker on Desktop
         run: |
