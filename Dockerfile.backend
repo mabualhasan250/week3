@@ -6,6 +6,6 @@ COPY app.py agent.py __init__.py ./
 COPY templates/ ./templates/
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-EXPOSE 5000
+EXPOSE 80
 CMD ["python", "app.py"]
 
