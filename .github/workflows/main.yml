@@ -69,7 +69,7 @@ jobs:
           # 1. Move to your project directory
           cd /home/cybersecurity/Desktop/week3
 
-          .\vault-secret.sh
+          ./vault-secret.sh
           
 
           # 3. Restart the containers
