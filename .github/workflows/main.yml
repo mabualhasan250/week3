@@ -1,52 +1,77 @@
-name: Build and Push to GHCR
+name: CI/CD Pipeline
+
+ 
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+
+ 
 
 jobs:
-  build-and-push:
+  build:
     runs-on: self-hosted
-    permissions:
-      contents: read
-      packages: write
+
+ 
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+ 
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.public1}}" | docker login ghcr.io -u mabualhasan250 --password-stdin
+
+ 
+
+      - name: Build image
+        run: |
+          docker build -t ghcr.io/mabualhasan250/week3:latest .
+
+ 
+
+      - name: Push image
+        run: |
+          docker push ghcr.io/mabualhasan250/week3:latest
+
+      - name: Build frontend image
+        run: |
+          docker build -t ghcr.io/mabualhasan250/week3-templates:latest ./templates
+
+ 
+
+      - name: Push frontend image
+        run: |
+          docker push ghcr.io/mabualhasan250/week3-templates:latest
+
+ 
+
+  deploy:
+    runs-on: self-hosted
+    needs: build
+
+ 
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3  # Updated to v4 to fix the Node.js warning
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+ 
 
-      - name: Build and Push Backend
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile.backend
-          push: true
-         
-          tags: ghcr.io/${{ github.repository_owner }}/week3-backend:latest
+      - name: Login to GHCR
+        run: echo "${{ secrets.pubic1 }}" | docker login ghcr.io -u mabualhasan250 --password-stdin
 
-      - name: Build and Push Frontend
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./templates/Dockerfile.frontend
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/week3-frontend:latest
+ 
 
-  deploy:
-    needs: build-and-push
-    runs-on: self-hosted 
-    steps:
-      - name: Pull and Restart Docker on Desktop
+      - name: Deploy to Docker
         run: |
-          
-          cd ~/Desktop/week3/
-          docker compose down
+          # 1. Move to your project directory
+          cd /home/cybersecurity/week3
+
+
+
+          # 3. Restart the containers
+          docker compose down 
           docker compose up -d
-      
