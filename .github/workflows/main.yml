@@ -26,9 +26,9 @@ jobs:
 
  
 
-      - name: Build image
+      - name: Build backend image
         run: |
-          docker build -t ghcr.io/mabualhasan250/week3:latest .
+          docker build -t ghcr.io/mabualhasan250/week3:latest -f Dockerfile.backend .
 
  
 
@@ -38,8 +38,7 @@ jobs:
 
       - name: Build frontend image
         run: |
-          docker build -t ghcr.io/mabualhasan250/week3-templates:latest ./templates
-
+          docker build -t ghcr.io/mabualhasan250/week3-templates:latest -f ./templates/Dockerfile.frontend ./templates
  
 
       - name: Push frontend image
